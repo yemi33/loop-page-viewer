@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Loop Page Viewer</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          sans-serif;
+        color: #1a1a1a;
+        background: #fff;
+        padding: 16px;
+        line-height: 1.6;
+      }
+
+      .header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 16px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid #e5e5e5;
+      }
+
+      .header-left {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-width: 0;
+      }
+
+      .loop-icon {
+        width: 24px;
+        height: 24px;
+        flex-shrink: 0;
+      }
+
+      .page-title {
+        font-size: 18px;
+        font-weight: 600;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .header-actions {
+        display: flex;
+        gap: 8px;
+        flex-shrink: 0;
+      }
+
+      button {
+        padding: 6px 14px;
+        border-radius: 6px;
+        border: 1px solid #d1d1d1;
+        background: #fff;
+        color: #1a1a1a;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background 0.15s, border-color 0.15s;
+      }
+
+      button:hover {
+        background: #f5f5f5;
+        border-color: #b3b3b3;
+      }
+
+      button.primary {
+        background: #6264a7;
+        color: #fff;
+        border-color: #6264a7;
+      }
+
+      button.primary:hover {
+        background: #4f4f8b;
+      }
+
+      button.danger {
+        color: #d13438;
+        border-color: #d13438;
+      }
+
+      button.danger:hover {
+        background: #fdf3f4;
+      }
+
+      .open-link {
+        color: #6264a7;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 500;
+        padding: 6px 0;
+      }
+
+      .open-link:hover {
+        text-decoration: underline;
+      }
+
+      /* View mode */
+      #view-container {
+        min-height: 60px;
+      }
+
+      #view-container h1,
+      #view-container h2,
+      #view-container h3 {
+        margin-top: 20px;
+        margin-bottom: 8px;
+      }
+
+      #view-container h1 { font-size: 1.5em; }
+      #view-container h2 { font-size: 1.25em; }
+      #view-container h3 { font-size: 1.1em; }
+
+      #view-container p {
+        margin-bottom: 10px;
+      }
+
+      #view-container ul,
+      #view-container ol {
+        margin-bottom: 10px;
+        padding-left: 24px;
+      }
+
+      #view-container li {
+        margin-bottom: 4px;
+      }
+
+      #view-container code {
+        background: #f0f0f0;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 0.9em;
+      }
+
+      #view-container pre {
+        background: #f6f6f6;
+        padding: 12px;
+        border-radius: 6px;
+        overflow-x: auto;
+        margin-bottom: 10px;
+      }
+
+      #view-container pre code {
+        background: none;
+        padding: 0;
+      }
+
+      #view-container blockquote {
+        border-left: 3px solid #6264a7;
+        padding-left: 12px;
+        color: #555;
+        margin-bottom: 10px;
+      }
+
+      #view-container table {
+        border-collapse: collapse;
+        width: 100%;
+        margin-bottom: 10px;
+      }
+
+      #view-container th,
+      #view-container td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+      }
+
+      #view-container th {
+        background: #f6f6f6;
+        font-weight: 600;
+      }
+
+      #view-container a {
+        color: #6264a7;
+      }
+
+      #view-container img {
+        max-width: 100%;
+        border-radius: 4px;
+      }
+
+      /* Edit mode */
+      #edit-container {
+        display: none;
+      }
+
+      .edit-title {
+        width: 100%;
+        font-size: 18px;
+        font-weight: 600;
+        padding: 8px 10px;
+        border: 1px solid #d1d1d1;
+        border-radius: 6px;
+        margin-bottom: 10px;
+        font-family: inherit;
+      }
+
+      .edit-content {
+        width: 100%;
+        min-height: 300px;
+        padding: 10px;
+        border: 1px solid #d1d1d1;
+        border-radius: 6px;
+        font-family: "Cascadia Code", "Fira Code", "Consolas", monospace;
+        font-size: 14px;
+        line-height: 1.5;
+        resize: vertical;
+        tab-size: 2;
+      }
+
+      .edit-content:focus,
+      .edit-title:focus {
+        outline: none;
+        border-color: #6264a7;
+        box-shadow: 0 0 0 2px rgba(98, 100, 167, 0.2);
+      }
+
+      .status-bar {
+        margin-top: 8px;
+        font-size: 12px;
+        color: #888;
+      }
+
+      .status-bar.saving {
+        color: #6264a7;
+      }
+
+      .status-bar.saved {
+        color: #107c10;
+      }
+
+      .status-bar.error {
+        color: #d13438;
+      }
+
+      .empty-state {
+        color: #888;
+        font-style: italic;
+        padding: 20px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <div class="header-left">
+        <svg class="loop-icon" viewBox="0 0 24 24" fill="none">
+          <path
+            d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15.5v-4.17l-3.59 3.59L6 15.5 9.17 12.33H5v-1.5h4.17L5.58 7.24 7 5.82l3.59 3.59V5h1.5v4.41l3.59-3.59L17.1 7.24l-3.59 3.59H18v1.5h-4.49l3.59 3.59-1.42 1.42-3.59-3.59v4.17H11z"
+            fill="#6264a7"
+          />
+        </svg>
+        <span class="page-title" id="page-title">Loading...</span>
+      </div>
+      <div class="header-actions">
+        <a class="open-link" id="open-link" href="#" target="_blank" style="display:none">
+          Open in Loop
+        </a>
+        <button id="edit-btn">Edit</button>
+        <button id="save-btn" class="primary" style="display:none">Save</button>
+        <button id="cancel-btn" class="danger" style="display:none">Cancel</button>
+      </div>
+    </div>
+
+    <div id="view-container">
+      <div class="empty-state">Loading page content...</div>
+    </div>
+
+    <div id="edit-container">
+      <input
+        type="text"
+        class="edit-title"
+        id="edit-title"
+        placeholder="Page title"
+      />
+      <textarea
+        class="edit-content"
+        id="edit-content"
+        placeholder="Page content in Markdown..."
+      ></textarea>
+    </div>
+
+    <div class="status-bar" id="status-bar"></div>
+
+    <script type="module" src="/src/mcp-app.ts"></script>
+  </body>
+</html>
