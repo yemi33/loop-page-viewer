@@ -6,6 +6,7 @@ import express from "express";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { z } from "zod";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const RESOURCE_MIME_TYPE = "text/html";
@@ -17,34 +18,17 @@ const server = new McpServer({
 const viewerResourceUri = "ui://loop-page-viewer/mcp-app.html";
 
 // Tool to show a Loop page inline in chat
-server.registerTool(
+server.tool(
   "show_loop_page",
+  "Renders a Loop page inline in chat with view and edit capabilities. " +
+    "Use this after creating or fetching a Loop page to display it interactively. " +
+    "Pass the page title, markdown content, link, workspaceId, and pageId.",
   {
-    title: "Show Loop Page",
-    description:
-      "Renders a Loop page inline in chat with view and edit capabilities. " +
-      "Use this after creating or fetching a Loop page to display it interactively. " +
-      "Pass the page title, markdown content, link, workspaceId, and pageId.",
-    inputSchema: {
-      title: { type: "string" as const, description: "The page title" },
-      content: {
-        type: "string" as const,
-        description: "The page content in Markdown format",
-      },
-      link: {
-        type: "string" as const,
-        description: "Deep link to open the page in Loop",
-      },
-      workspaceId: {
-        type: "string" as const,
-        description: "The workspace pod ID containing the page",
-      },
-      pageId: {
-        type: "string" as const,
-        description: "The base64-encoded page ID",
-      },
-    },
-    _meta: { ui: { resourceUri: viewerResourceUri } },
+    title: z.string().describe("The page title"),
+    content: z.string().describe("The page content in Markdown format"),
+    link: z.string().describe("Deep link to open the page in Loop"),
+    workspaceId: z.string().describe("The workspace pod ID containing the page"),
+    pageId: z.string().describe("The base64-encoded page ID"),
   },
   async ({ title, content, link, workspaceId, pageId }) => {
     return {
@@ -54,6 +38,7 @@ server.registerTool(
           text: JSON.stringify({ title, content, link, workspaceId, pageId }),
         },
       ],
+      _meta: { ui: { resourceUri: viewerResourceUri } },
     };
   },
 );
@@ -65,19 +50,10 @@ server.tool(
     "Returns the updated content so the host can forward it to the Loop MCP " +
     "server via mcp__loop__update_page.",
   {
-    workspaceId: {
-      type: "string" as const,
-      description: "The workspace pod ID",
-    },
-    pageId: {
-      type: "string" as const,
-      description: "The base64-encoded page ID",
-    },
-    title: { type: "string" as const, description: "Updated page title" },
-    content: {
-      type: "string" as const,
-      description: "Updated page content in Markdown",
-    },
+    workspaceId: z.string().describe("The workspace pod ID"),
+    pageId: z.string().describe("The base64-encoded page ID"),
+    title: z.string().describe("Updated page title"),
+    content: z.string().describe("Updated page content in Markdown"),
   },
   async ({ workspaceId, pageId, title, content }) => {
     return {
