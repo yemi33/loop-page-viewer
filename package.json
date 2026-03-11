@@ -9,7 +9,7 @@
     "dev": "npm run build && npm run serve:http"
   },
   "dependencies": {
-    "@modelcontextprotocol/ext-apps": "^0.1.0",
+    "@modelcontextprotocol/ext-apps": "^1.2.2",
     "@modelcontextprotocol/sdk": "^1.13.0",
     "cors": "^2.8.5",
     "express": "^4.21.0",

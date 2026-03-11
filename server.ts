@@ -1,6 +1,11 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
+import {
+  registerAppTool,
+  registerAppResource,
+  RESOURCE_MIME_TYPE,
+} from "@modelcontextprotocol/ext-apps/server";
 import cors from "cors";
 import express from "express";
 import fs from "node:fs/promises";
@@ -9,7 +14,6 @@ import { fileURLToPath } from "node:url";
 import { z } from "zod";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const RESOURCE_MIME_TYPE = "text/html";
 const server = new McpServer({
   name: "Loop Page Viewer",
   version: "1.0.0",
@@ -18,17 +22,25 @@ const server = new McpServer({
 const viewerResourceUri = "ui://loop-page-viewer/mcp-app.html";
 
 // Tool to show a Loop page inline in chat
-server.tool(
+registerAppTool(
+  server,
   "show_loop_page",
-  "Renders a Loop page inline in chat with view and edit capabilities. " +
-    "Use this after creating or fetching a Loop page to display it interactively. " +
-    "Pass the page title, markdown content, link, workspaceId, and pageId.",
   {
-    title: z.string().describe("The page title"),
-    content: z.string().describe("The page content in Markdown format"),
-    link: z.string().describe("Deep link to open the page in Loop"),
-    workspaceId: z.string().describe("The workspace pod ID containing the page"),
-    pageId: z.string().describe("The base64-encoded page ID"),
+    title: "Show Loop Page",
+    description:
+      "Renders a Loop page inline in chat with view and edit capabilities. " +
+      "Use this after creating or fetching a Loop page to display it interactively. " +
+      "Pass the page title, markdown content, link, workspaceId, and pageId.",
+    inputSchema: {
+      title: z.string().describe("The page title"),
+      content: z.string().describe("The page content in Markdown format"),
+      link: z.string().describe("Deep link to open the page in Loop"),
+      workspaceId: z
+        .string()
+        .describe("The workspace pod ID containing the page"),
+      pageId: z.string().describe("The base64-encoded page ID"),
+    },
+    _meta: { ui: { resourceUri: viewerResourceUri } },
   },
   async ({ title, content, link, workspaceId, pageId }) => {
     return {
@@ -38,22 +50,32 @@ server.tool(
           text: JSON.stringify({ title, content, link, workspaceId, pageId }),
         },
       ],
-      _meta: { ui: { resourceUri: viewerResourceUri } },
     };
   },
 );
 
 // Tool the UI calls when the user saves edits
-server.tool(
+registerAppTool(
+  server,
   "request_page_update",
-  "Called by the inline Loop page viewer when the user edits and saves. " +
-    "Returns the updated content so the host can forward it to the Loop MCP " +
-    "server via mcp__loop__update_page.",
   {
-    workspaceId: z.string().describe("The workspace pod ID"),
-    pageId: z.string().describe("The base64-encoded page ID"),
-    title: z.string().describe("Updated page title"),
-    content: z.string().describe("Updated page content in Markdown"),
+    title: "Request Page Update",
+    description:
+      "Called by the inline Loop page viewer when the user edits and saves. " +
+      "Returns the updated content so the host can forward it to the Loop MCP " +
+      "server via mcp__loop__update_page.",
+    inputSchema: {
+      workspaceId: z.string().describe("The workspace pod ID"),
+      pageId: z.string().describe("The base64-encoded page ID"),
+      title: z.string().describe("Updated page title"),
+      content: z.string().describe("Updated page content in Markdown"),
+    },
+    _meta: {
+      ui: {
+        resourceUri: viewerResourceUri,
+        visibility: ["app"],
+      },
+    },
   },
   async ({ workspaceId, pageId, title, content }) => {
     return {
@@ -75,17 +97,25 @@ server.tool(
 );
 
 // Serve the bundled HTML as a resource
-server.resource(viewerResourceUri, viewerResourceUri, async () => {
-  const html = await fs.readFile(
-    path.join(__dirname, "dist", "mcp-app.html"),
-    "utf-8",
-  );
-  return {
-    contents: [
-      { uri: viewerResourceUri, mimeType: RESOURCE_MIME_TYPE, text: html },
-    ],
-  };
-});
+registerAppResource(
+  server,
+  "Loop Page Viewer",
+  viewerResourceUri,
+  {
+    description: "Interactive inline viewer for Loop pages",
+  },
+  async () => {
+    const html = await fs.readFile(
+      path.join(__dirname, "dist", "mcp-app.html"),
+      "utf-8",
+    );
+    return {
+      contents: [
+        { uri: viewerResourceUri, mimeType: RESOURCE_MIME_TYPE, text: html },
+      ],
+    };
+  },
+);
 
 // Choose transport based on CLI flag
 const useHttp = process.argv.includes("--http");
