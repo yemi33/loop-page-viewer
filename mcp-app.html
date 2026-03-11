@@ -15,40 +15,109 @@
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
           sans-serif;
         color: #1a1a1a;
-        background: #fff;
-        padding: 16px;
+        background: transparent;
         line-height: 1.6;
+      }
+
+      /* ── Chicklet (collapsed card) ── */
+      .chicklet {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 14px;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        background: #fafafa;
+        cursor: pointer;
+        transition: background 0.15s, box-shadow 0.15s, border-color 0.15s;
+        max-width: 480px;
+        user-select: none;
+      }
+
+      .chicklet:hover {
+        background: #f0f0fa;
+        border-color: #c4c4e0;
+        box-shadow: 0 1px 4px rgba(98, 100, 167, 0.12);
+      }
+
+      .chicklet-icon {
+        width: 32px;
+        height: 32px;
+        flex-shrink: 0;
+        background: #ededf7;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .chicklet-icon svg {
+        width: 20px;
+        height: 20px;
+      }
+
+      .chicklet-body {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .chicklet-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: #1a1a1a;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .chicklet-preview {
+        font-size: 12px;
+        color: #666;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        margin-top: 1px;
+      }
+
+      .chicklet-chevron {
+        flex-shrink: 0;
+        width: 16px;
+        height: 16px;
+        color: #999;
+        transition: transform 0.2s;
+      }
+
+      .chicklet-chevron.expanded {
+        transform: rotate(180deg);
+      }
+
+      /* ── Expanded view ── */
+      #expanded-view {
+        display: none;
+        border: 1px solid #e0e0e0;
+        border-top: none;
+        border-radius: 0 0 8px 8px;
+        background: #fff;
+        max-width: 480px;
+        overflow: hidden;
+      }
+
+      #expanded-view.open {
+        display: block;
+      }
+
+      .expanded-inner {
+        padding: 16px;
       }
 
       .header {
         display: flex;
         align-items: center;
-        justify-content: space-between;
-        gap: 12px;
-        margin-bottom: 16px;
-        padding-bottom: 12px;
-        border-bottom: 1px solid #e5e5e5;
-      }
-
-      .header-left {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        min-width: 0;
-      }
-
-      .loop-icon {
-        width: 24px;
-        height: 24px;
-        flex-shrink: 0;
-      }
-
-      .page-title {
-        font-size: 18px;
-        font-weight: 600;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
+        justify-content: flex-end;
+        gap: 8px;
+        margin-bottom: 12px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #f0f0f0;
       }
 
       .header-actions {
@@ -58,12 +127,12 @@
       }
 
       button {
-        padding: 6px 14px;
+        padding: 5px 12px;
         border-radius: 6px;
         border: 1px solid #d1d1d1;
         background: #fff;
         color: #1a1a1a;
-        font-size: 13px;
+        font-size: 12px;
         font-weight: 500;
         cursor: pointer;
         transition: background 0.15s, border-color 0.15s;
@@ -96,9 +165,9 @@
       .open-link {
         color: #6264a7;
         text-decoration: none;
-        font-size: 13px;
+        font-size: 12px;
         font-weight: 500;
-        padding: 6px 0;
+        padding: 5px 0;
       }
 
       .open-link:hover {
@@ -107,47 +176,48 @@
 
       /* View mode */
       #view-container {
-        min-height: 60px;
+        min-height: 40px;
+        font-size: 14px;
       }
 
       #view-container h1,
       #view-container h2,
       #view-container h3 {
-        margin-top: 20px;
-        margin-bottom: 8px;
+        margin-top: 16px;
+        margin-bottom: 6px;
       }
 
-      #view-container h1 { font-size: 1.5em; }
-      #view-container h2 { font-size: 1.25em; }
-      #view-container h3 { font-size: 1.1em; }
+      #view-container h1 { font-size: 1.4em; }
+      #view-container h2 { font-size: 1.2em; }
+      #view-container h3 { font-size: 1.05em; }
 
       #view-container p {
-        margin-bottom: 10px;
+        margin-bottom: 8px;
       }
 
       #view-container ul,
       #view-container ol {
-        margin-bottom: 10px;
-        padding-left: 24px;
+        margin-bottom: 8px;
+        padding-left: 22px;
       }
 
       #view-container li {
-        margin-bottom: 4px;
+        margin-bottom: 3px;
       }
 
       #view-container code {
         background: #f0f0f0;
-        padding: 2px 6px;
+        padding: 2px 5px;
         border-radius: 4px;
-        font-size: 0.9em;
+        font-size: 0.88em;
       }
 
       #view-container pre {
         background: #f6f6f6;
-        padding: 12px;
+        padding: 10px;
         border-radius: 6px;
         overflow-x: auto;
-        margin-bottom: 10px;
+        margin-bottom: 8px;
       }
 
       #view-container pre code {
@@ -157,22 +227,23 @@
 
       #view-container blockquote {
         border-left: 3px solid #6264a7;
-        padding-left: 12px;
+        padding-left: 10px;
         color: #555;
-        margin-bottom: 10px;
+        margin-bottom: 8px;
       }
 
       #view-container table {
         border-collapse: collapse;
         width: 100%;
-        margin-bottom: 10px;
+        margin-bottom: 8px;
       }
 
       #view-container th,
       #view-container td {
         border: 1px solid #ddd;
-        padding: 8px;
+        padding: 6px 8px;
         text-align: left;
+        font-size: 13px;
       }
 
       #view-container th {
@@ -196,23 +267,23 @@
 
       .edit-title {
         width: 100%;
-        font-size: 18px;
+        font-size: 16px;
         font-weight: 600;
-        padding: 8px 10px;
+        padding: 7px 10px;
         border: 1px solid #d1d1d1;
         border-radius: 6px;
-        margin-bottom: 10px;
+        margin-bottom: 8px;
         font-family: inherit;
       }
 
       .edit-content {
         width: 100%;
-        min-height: 300px;
-        padding: 10px;
+        min-height: 200px;
+        padding: 8px 10px;
         border: 1px solid #d1d1d1;
         border-radius: 6px;
         font-family: "Cascadia Code", "Fira Code", "Consolas", monospace;
-        font-size: 14px;
+        font-size: 13px;
         line-height: 1.5;
         resize: vertical;
         tab-size: 2;
@@ -226,8 +297,8 @@
       }
 
       .status-bar {
-        margin-top: 8px;
-        font-size: 12px;
+        margin-top: 6px;
+        font-size: 11px;
         color: #888;
       }
 
@@ -246,50 +317,71 @@
       .empty-state {
         color: #888;
         font-style: italic;
-        padding: 20px 0;
+        padding: 16px 0;
+      }
+
+      /* When chicklet is expanded, remove bottom radius */
+      .chicklet.expanded {
+        border-radius: 8px 8px 0 0;
+        border-bottom-color: #f0f0f0;
       }
     </style>
   </head>
   <body>
-    <div class="header">
-      <div class="header-left">
-        <svg class="loop-icon" viewBox="0 0 24 24" fill="none">
+    <!-- Chicklet: compact inline card -->
+    <div class="chicklet" id="chicklet" role="button" tabindex="0" aria-expanded="false">
+      <div class="chicklet-icon">
+        <svg viewBox="0 0 24 24" fill="none">
           <path
             d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15.5v-4.17l-3.59 3.59L6 15.5 9.17 12.33H5v-1.5h4.17L5.58 7.24 7 5.82l3.59 3.59V5h1.5v4.41l3.59-3.59L17.1 7.24l-3.59 3.59H18v1.5h-4.49l3.59 3.59-1.42 1.42-3.59-3.59v4.17H11z"
             fill="#6264a7"
           />
         </svg>
-        <span class="page-title" id="page-title">Loading...</span>
       </div>
-      <div class="header-actions">
-        <a class="open-link" id="open-link" href="#" target="_blank" style="display:none">
-          Open in Loop
-        </a>
-        <button id="edit-btn">Edit</button>
-        <button id="save-btn" class="primary" style="display:none">Save</button>
-        <button id="cancel-btn" class="danger" style="display:none">Cancel</button>
+      <div class="chicklet-body">
+        <div class="chicklet-title" id="chicklet-title">Loading...</div>
+        <div class="chicklet-preview" id="chicklet-preview"></div>
+      </div>
+      <svg class="chicklet-chevron" id="chicklet-chevron" viewBox="0 0 16 16" fill="none">
+        <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+
+    <!-- Expanded view (hidden by default) -->
+    <div id="expanded-view">
+      <div class="expanded-inner">
+        <div class="header">
+          <div class="header-actions">
+            <a class="open-link" id="open-link" href="#" target="_blank" style="display:none">
+              Open in Loop
+            </a>
+            <button id="edit-btn">Edit</button>
+            <button id="save-btn" class="primary" style="display:none">Save</button>
+            <button id="cancel-btn" class="danger" style="display:none">Cancel</button>
+          </div>
+        </div>
+
+        <div id="view-container">
+          <div class="empty-state">Loading page content...</div>
+        </div>
+
+        <div id="edit-container">
+          <input
+            type="text"
+            class="edit-title"
+            id="edit-title"
+            placeholder="Page title"
+          />
+          <textarea
+            class="edit-content"
+            id="edit-content"
+            placeholder="Page content in Markdown..."
+          ></textarea>
+        </div>
+
+        <div class="status-bar" id="status-bar"></div>
       </div>
     </div>
-
-    <div id="view-container">
-      <div class="empty-state">Loading page content...</div>
-    </div>
-
-    <div id="edit-container">
-      <input
-        type="text"
-        class="edit-title"
-        id="edit-title"
-        placeholder="Page title"
-      />
-      <textarea
-        class="edit-content"
-        id="edit-content"
-        placeholder="Page content in Markdown..."
-      ></textarea>
-    </div>
-
-    <div class="status-bar" id="status-bar"></div>
 
     <script type="module" src="/src/mcp-app.ts"></script>
   </body>

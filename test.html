@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Chicklet Test</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #f5f5f5;
+      margin: 0;
+      padding: 40px;
+      display: flex;
+      justify-content: center;
+    }
+    .chat-bubble {
+      background: #fff;
+      border-radius: 12px;
+      padding: 16px;
+      max-width: 560px;
+      width: 100%;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<body>
+  <div class="chat-bubble">
+    <!-- The chicklet app renders here (pulled from mcp-app.html body) -->
+    <div id="app-root"></div>
+  </div>
+
+  <!-- Inject test data before the app script runs -->
+  <script>
+    window.__MCP_TOOL_RESULT__ = {
+      content: [{
+        type: "text",
+        text: JSON.stringify({
+          title: "can you help create a page on",
+          content: "Yes — I can help with that 👍\n\nI'll create a **clean, developer‑focused Page** on **Claude Code** that you can keep or iterate on.\n\nBelow is a solid first version, written to be concise and technical (no fluff). If you want it framed differently (e.g., comparison vs Copilot, usage tips, limitations, evals), we can refine it afterward.\n\n---\n\n## 📄 Page: Claude Code\n\n### What is Claude Code?\n\n**Claude Code** is Anthropic's developer-facing AI coding assistant built on the Claude family of large language models. It is designed to help engineers read, write, refactor, and reason about codebases with a strong emphasis on **code understanding**, **accuracy**, and **long-context reasoning**.\n\nClaude Code is typically accessed via:\n\n- CLI tooling\n- IDE integrations\n- APIs exposed through Anthropic's developer platform\n\n---\n\n### Core Capabilities\n\n**Code Understanding**\n\n- Reads and reasons over large files and multi-file codebases\n- Strong at tracing logic, invariants, and edge cases\n- Handles long context (useful for monorepos or legacy code)\n\n**Code Generation**\n\n- Generates new code from high‑level descriptions\n- Supports common languages used in production systems\n- Writes idiomatic code with readable structure\n\n**Refactoring & Maintenance**\n\n- Refactors existing code while preserving behavior\n- Explains unfamiliar or complex code paths\n- Assists with migrations and cleanup tasks\n\n**Debugging & Reasoning**\n\n- Helps identify logical bugs and missing cases\n- Produces step‑by‑step reasoning when needed\n- Can propose fixes with clear justifications\n\n---\n\n### Claude Models Used for Code\n\nClaude Code typically uses higher‑tier Claude models (e.g. **Claude 3+ series**), which are optimized for:\n\n- Longer context windows\n- Strong reasoning over structured text\n- Safer and more conservative outputs compared to purely generative models\n\nThis makes it particularly effective for **analysis-heavy coding tasks** rather than quick autocomplete.\n\n---\n\n### Typical Workflows\n\n- Exploring an unfamiliar codebase\n- Asking \"why does this work this way?\"\n- Refactoring legacy or poorly documented code\n- Generating tests from existing logic\n- Reviewing changes or PR‑style diffs\n- Prototyping implementations from design notes\n\n---\n\n### Strengths\n\n- Very strong at **reading and explaining existing code**\n- Handles **long context** better than many alternatives\n- Produces careful, well‑reasoned answers\n- Lower tendency to hallucinate APIs when compared to some tools\n\n---\n\n### Limitations\n\n- Not primarily optimized for ultra‑fast inline autocomplete\n- Quality depends heavily on prompt clarity and provided context\n- Less tightly integrated into some IDE ecosystems compared to competitors\n\n---\n\n### Claude Code vs Copilot (High‑Level)\n\n- **Claude Code** excels at *deep reasoning, explanation, and large-context analysis*\n- **Copilot** excels at *inline completion and tight IDE workflow*\n- Many developers use Claude Code as a **\"thinking partner\"** and Copilot as a **\"typing accelerator\"**\n\n---\n\n### When to Use Claude Code\n\nUse Claude Code when you need:\n\n- High confidence explanations\n- Careful refactors\n- Help understanding complex systems\n- Reasoned tradeoffs rather than just snippets",
+          link: "https://microsoft.sharepoint-df.com/:fl:/r/contentstorage/x8FNO-xtskuCRX2_fMTHLRo8YaOBF1tMsxtMIJmILxo/Document%20Library/Copilot/can%20you%20help%20create%20a%20page%20on.loop?d=wd28640699b084c0a9bb8dda104386795&csf=1&web=1",
+          workspaceId: "T0RTUHxtaWNyb3NvZnQuc2hhcmVwb2ludC1kZi5jb218YiFsUlpRZmVUWlEwQzlJb1J3RzVwcUFpQXJTV3lSOE5wQmlvcVZ6TGozTUc5Ri0zUlFmMGNyUW9rSTdmMUlwaWhTfDAxS1hKV1Q1N0VLUUxYWFdEM1NaQzJENDIyV0pDN0NNVkQ=",
+          pageId: "bWljcm9zb2Z0LnNoYXJlcG9pbnQtZGYuY29tLGIhbFJaUWZlVFpRMEM5SW9Sd0c1cHFBaUFyU1d5UjhOcEJpb3FWekxqM01HOUYtM1JRZjBjclFva0k3ZjFJcGloUywwMUtYSldUNTNKSUNETkVDRTNCSkdKWE9HNVVFQ0RRWjRW"
+        })
+      }]
+    };
+  </script>
+
+  <!-- Load the app styles and markup inline, then the script -->
+  <link rel="stylesheet" href="/mcp-app-styles.css" onerror="this.remove()" />
+
+  <script type="module">
+    // Fetch the app HTML and extract body content + styles
+    const resp = await fetch("/mcp-app.html");
+    const html = await resp.text();
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, "text/html");
+
+    // Copy styles
+    const style = doc.querySelector("style");
+    if (style) document.head.appendChild(style.cloneNode(true));
+
+    // Copy body content into our app root
+    const root = document.getElementById("app-root");
+    root.innerHTML = doc.body.innerHTML;
+
+    // Remove the original script tag (we'll load it ourselves)
+    const oldScript = root.querySelector('script[type="module"]');
+    if (oldScript) oldScript.remove();
+
+    // Now load the app module
+    await import("/src/mcp-app.ts");
+  </script>
+</body>
+</html>

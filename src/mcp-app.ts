@@ -2,7 +2,11 @@ import { App } from "@modelcontextprotocol/ext-apps";
 import { marked } from "marked";
 
 // DOM elements
-const pageTitleEl = document.getElementById("page-title")!;
+const chickletEl = document.getElementById("chicklet")!;
+const chickletTitleEl = document.getElementById("chicklet-title")!;
+const chickletPreviewEl = document.getElementById("chicklet-preview")!;
+const chickletChevronEl = document.getElementById("chicklet-chevron")!;
+const expandedViewEl = document.getElementById("expanded-view")!;
 const openLinkEl = document.getElementById("open-link") as HTMLAnchorElement;
 const viewContainer = document.getElementById("view-container")!;
 const editContainer = document.getElementById("edit-container")!;
@@ -25,6 +29,7 @@ let pageData: {
 } | null = null;
 
 let isEditing = false;
+let isExpanded = false;
 
 // Configure marked for safe rendering
 marked.setOptions({
@@ -32,10 +37,33 @@ marked.setOptions({
   gfm: true,
 });
 
+// Generate a plain-text preview (first ~120 chars of content)
+function getPreviewText(markdown: string): string {
+  const plain = markdown
+    .replace(/^#{1,6}\s+/gm, "") // strip heading markers
+    .replace(/\*\*(.+?)\*\*/g, "$1") // bold
+    .replace(/\*(.+?)\*/g, "$1") // italic
+    .replace(/`(.+?)`/g, "$1") // inline code
+    .replace(/\[(.+?)\]\(.+?\)/g, "$1") // links
+    .replace(/!\[.*?\]\(.+?\)/g, "") // images
+    .replace(/^\s*[-*+]\s+/gm, "") // list markers
+    .replace(/^\s*\d+\.\s+/gm, "") // ordered list markers
+    .replace(/\n+/g, " ") // collapse newlines
+    .trim();
+  return plain.length > 120 ? plain.slice(0, 117) + "..." : plain;
+}
+
+function renderChicklet() {
+  if (!pageData) return;
+  chickletTitleEl.textContent = pageData.title;
+  const preview = getPreviewText(pageData.content);
+  chickletPreviewEl.textContent = preview || "Empty page";
+}
+
 function renderPage() {
   if (!pageData) return;
 
-  pageTitleEl.textContent = pageData.title;
+  renderChicklet();
 
   if (pageData.link) {
     openLinkEl.href = pageData.link;
@@ -50,8 +78,17 @@ function renderPage() {
   }
 }
 
+function toggleExpand() {
+  isExpanded = !isExpanded;
+  expandedViewEl.classList.toggle("open", isExpanded);
+  chickletEl.classList.toggle("expanded", isExpanded);
+  chickletChevronEl.classList.toggle("expanded", isExpanded);
+  chickletEl.setAttribute("aria-expanded", String(isExpanded));
+}
+
 function enterEditMode() {
   if (!pageData) return;
+  if (!isExpanded) toggleExpand();
   isEditing = true;
   editTitleEl.value = pageData.title;
   editContentEl.value = pageData.content;
@@ -81,11 +118,40 @@ function setStatus(text: string, type: "saving" | "saved" | "error" | "") {
   statusBar.className = `status-bar ${type}`;
 }
 
-// Initialize the MCP App
-const app = new App({ name: "Loop Page Viewer", version: "1.0.0" });
-app.connect();
+// Chicklet click to expand/collapse
+chickletEl.addEventListener("click", toggleExpand);
+chickletEl.addEventListener("keydown", (e) => {
+  if (e.key === "Enter" || e.key === " ") {
+    e.preventDefault();
+    toggleExpand();
+  }
+});
 
-// Handle tool result pushed by the host
+// Try injected data first (Bebop host injects this before </head>)
+const injectedData = (window as Record<string, unknown>).__MCP_TOOL_RESULT__ as
+  | { content?: Array<{ type: string; text?: string }> }
+  | undefined;
+
+if (injectedData?.content) {
+  const text = injectedData.content.find((c) => c.type === "text")?.text;
+  if (text) {
+    try {
+      pageData = JSON.parse(text);
+      renderPage();
+    } catch {
+      viewContainer.innerHTML = `<div class="empty-state">Failed to parse page data.</div>`;
+    }
+  }
+}
+
+// Also initialize the MCP App protocol for hosts that support it (e.g. Claude Code desktop)
+const app = new App({ name: "Loop Page Viewer", version: "1.0.0" });
+app.connect().catch(() => {
+  // Connection may fail in hosts that don't implement ext-apps protocol — that's OK
+  // if we already rendered from injected data above
+});
+
+// Handle tool result pushed by the host via ext-apps protocol
 app.ontoolresult = (result) => {
   const text = result.content?.find(
     (c: { type: string }) => c.type === "text",
