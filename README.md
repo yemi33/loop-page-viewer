@@ -82,9 +82,20 @@ Add the generated URL as a custom connector in Claude Desktop settings.
 
 1. You ask the LLM to create or fetch a Loop page (via your Loop MCP server)
 2. The LLM calls `show_loop_page` with the page data
-3. The host renders an interactive viewer inline in chat (sandboxed iframe)
-4. You can view the rendered markdown or switch to edit mode
-5. On save, the app calls `request_page_update`, and the LLM forwards the changes to `mcp__loop__update_page`
+3. The host renders an interactive **chicklet** inline in chat (sandboxed iframe)
+4. The chicklet shows a compact card with the Loop icon, page title, and a content preview
+5. Click the chicklet to expand and see the full rendered markdown
+6. Switch to edit mode to modify the page content
+7. On save, the app calls `request_page_update`, and the LLM forwards the changes to `mcp__loop__update_page`
+
+### Chicklet view
+
+The default rendering is a compact inline card inspired by the office-web-host embedded component pattern:
+
+- **Collapsed (default):** Loop icon, page title, content preview snippet, expand chevron
+- **Expanded (on click):** Full rendered markdown with "Open in Loop" link and Edit/Save/Cancel buttons
+- **Transparent background** so the component blends into the host UI
+- **Accessible:** keyboard navigable with `aria-expanded` state
 
 ## Development
 
@@ -99,6 +110,14 @@ To test with the [MCP Inspector](https://github.com/modelcontextprotocol/inspect
 
 ```bash
 npx @modelcontextprotocol/inspector npx tsx server.ts
+```
+
+To test the chicklet view in a browser with mock data:
+
+```bash
+npm run build
+npx vite --port 5173
+# Open http://localhost:5173/test.html
 ```
 
 To test rendering with the [basic-host](https://github.com/modelcontextprotocol/ext-apps/tree/main/examples/basic-host):
