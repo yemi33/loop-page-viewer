@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "loop-page-viewer": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["${CLAUDE_PLUGIN_ROOT}/start.js"]
+    }
+  }
+}
